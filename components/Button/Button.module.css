@@ -1,0 +1,16 @@
+
+.button{
+    margin-block: 2rem;
+    background-color: #9a02ac;
+    border: 1 px dotted #5b0d8f;
+    padding: .5rem 1rem;
+    color: #c372c9;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all .2s ease-in-out;
+}
+
+.button:hover{
+    background-color: #3f0046;
+    color: #ffffff98;
+}

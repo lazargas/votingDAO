@@ -1,0 +1,22 @@
+.input__box{
+    width: 100%;
+    background-color: #9a02ac;
+    padding: .5rem;
+    border-radius: .2rem;
+}
+
+.input__box input{
+    background-color: transparent;
+    border: 0;
+    width: 100%;
+    outline: none;
+    padding-inline: .5rem;
+    color: #fff;
+}
+
+.input__box input::placeholder{
+    color: #ffffff98;
+    font-weight:700;
+    text-transform: capitalize;
+}
+
