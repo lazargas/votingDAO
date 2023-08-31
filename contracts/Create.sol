@@ -79,6 +79,8 @@ contract Create{
     function setCandidate(address _address,string memory _age,string memory _name,string memory _image,string memory _ipfs) public {
         require(votingOrganiser==msg.sender,"Only Organiser can authorized candidate"
         );
+
+        require(candidates[_address]._address==0x0000000000000000000000000000000000000000,"Candidate Already Exists");
         
         _candidateId.increment();
 
@@ -135,6 +137,7 @@ contract Create{
 
     function voterRight(address _address,string memory _name,string memory _image,string memory _ipfs) public {
         require(votingOrganiser == msg.sender, "Only organiser can create a voter");
+        require(voters[_address].voter_address==0x0000000000000000000000000000000000000000,"Voter Already Exists");
 
         _voterId.increment();
 
@@ -172,7 +175,7 @@ contract Create{
 
         require(!voter.voter_voted,"You have already voted");
 
-        // require(voter.voter_allowed!=0,"You have No right to vote");
+        require(voter.voter_allowed!=0,"You have No right to vote");
 
         voter.voter_voted=true;
         voter.voter_vote = _candidateVoteId;
@@ -222,17 +225,20 @@ contract Create{
     function getWinner() public view returns (address){
     uint256 maxVoteCount = 0;
     address winnerAddress;
-
+    uint256 IfItIsADraw = 0;
     for (uint256 i = 0; i < candidateAdress.length; i++) {
         address currentAddress = candidateAdress[i];
         uint256 currentVoteCount = candidates[currentAddress].voteCount;
-
-        if (currentVoteCount > maxVoteCount) {
+        
+        if (currentVoteCount >= maxVoteCount) {
+            if(currentVoteCount==maxVoteCount){
+                IfItIsADraw = IfItIsADraw+1;
+            }
             maxVoteCount = currentVoteCount;
             winnerAddress = currentAddress;
         }
     }
-
+    require(IfItIsADraw==0,"The Vote was a draw");
     return winnerAddress;
     }
 }
