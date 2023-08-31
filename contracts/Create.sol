@@ -172,7 +172,7 @@ contract Create{
 
         require(!voter.voter_voted,"You have already voted");
 
-        require(voter.voter_allowed!=0,"You have No right to vote");
+        // require(voter.voter_allowed!=0,"You have No right to vote");
 
         voter.voter_voted=true;
         voter.voter_vote = _candidateVoteId;
@@ -215,13 +215,24 @@ contract Create{
         return votersAddress;
     }
 
-    function getWinner() public returns (address){
-        
+    function getVotefromCandidate(address _address) public view returns(uint256){
+            return candidates[_address].voteCount; 
     }
 
+    function getWinner() public view returns (address){
+    uint256 maxVoteCount = 0;
+    address winnerAddress;
 
+    for (uint256 i = 0; i < candidateAdress.length; i++) {
+        address currentAddress = candidateAdress[i];
+        uint256 currentVoteCount = candidates[currentAddress].voteCount;
 
+        if (currentVoteCount > maxVoteCount) {
+            maxVoteCount = currentVoteCount;
+            winnerAddress = currentAddress;
+        }
+    }
 
-
-
+    return winnerAddress;
+    }
 }
