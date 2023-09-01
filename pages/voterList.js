@@ -5,12 +5,13 @@ import Style from "../styles/voterList.module.css";
 
 import { VotingContext } from "../context/Voter";
 const voterList = () => {
-  const { getAllVoterData, voterArray } = useContext(VotingContext);
+  const { getAllVoterData, voterArray,pushCandidate } = useContext(VotingContext);
 
   useEffect(() => {
     getAllVoterData();
+    console.log(pushCandidate);
     console.log(voterArray);
-  }, []);
+  }, [voterArray]);
 
   return (
     <div className={Style.voterList}>

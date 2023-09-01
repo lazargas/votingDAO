@@ -5,7 +5,7 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 
-    background-image: linear-gradient(to right top,#310147,#3e0270,#5d1aa5,#8628dd,#bc02ff);
+    background:#000;
 
     height: 100%;
     width: 100%;
@@ -13,6 +13,10 @@ body {
 
 
 
+}
+
+::-webkit-scrollbar{
+  display: none;
 }
 
 a {

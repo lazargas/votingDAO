@@ -1,3 +1,7 @@
+@font-face {
+    font-family: poppins;
+    src: url(/assets/Gilroy-Bold.ttf);
+}
 
 .home{
     width: 70%;
@@ -29,7 +33,7 @@
     padding: 2rem;
     border-radius: .2rem;
     font-size: 1.5rem;
-    color: #B3B8CD;
+    color: #FFF;
     line-height: 0;
     position: relative;
 }
@@ -57,9 +61,29 @@
     background-color: #231E39;
     padding: .5rem;
     margin-left: .5rem;
-    color: #B3B8CD;
+    color: #FFF;
     border-radius: .2rem;
 }
+
+.winner_container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 400px;
+}
+
+.winner_button{
+   font-family: poppins;
+   font-size: 28px;
+   font-weight: 800;
+   color: #fff;
+   background-color: black;
+   border: solid white 5px;
+   border-radius: 20px;
+   padding : 20px;
+}
+
+
 
 
 

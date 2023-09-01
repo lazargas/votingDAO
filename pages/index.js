@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import Image from "next/image";
 import Countdown from "react-countdown";
+import {gsap} from "gsap";
 
 //INTERNAL IMPORT
 import { VotingContext } from "../context/Voter";
@@ -18,6 +19,8 @@ const index = () => {
     getAllVoterData,
     currentAccount,
     voterLength,
+    getWinner,
+    winner
   } = useContext(VotingContext);
 
   useEffect(() => {
@@ -26,6 +29,25 @@ const index = () => {
     checkIfWalletIsConnected();
     getAllVoterData();
   }, []);
+
+  useEffect(() => {
+
+    let ctx = gsap.context(() => {
+       const tl = gsap.timeline({
+       });
+       tl.to("#winnerbutton",{scaleX:"1.2"},'b').to("#winnerbutton",{scaleY:"1.2",background:"white",color:"black"},'b');
+       tl.pause();
+       const button = document.querySelector("#winnercontainer");
+       button.addEventListener("mouseenter",()=>{
+        tl.play();
+       });
+       button.addEventListener("mouseleave",()=>{
+        tl.reverse();
+       })
+    });
+    return () => ctx.revert(); 
+    
+  }, []); // Added an empty dependency array here
 
   return (
     <div className={Style.home}>
@@ -51,7 +73,12 @@ const index = () => {
         </div>
       )}
 
-      <Card candidateArray={candidateArray} giveVote={giveVote} />
+      {/* <Card candidateArray={candidateArray} giveVote={giveVote} /> */}
+      <div id="winnercontainer" className={Style.winner_container} >
+         <button id="winnerbutton" onClick={getWinner} className={Style.winner_button} >
+            {winner?`${winner}`:<div>Find Current Winner</div>}
+         </button>
+      </div>
     </div>
   );
 };

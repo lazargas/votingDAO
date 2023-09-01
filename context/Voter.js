@@ -1,95 +1,3 @@
-// import React, {useState,useEffect} from "react";
-// import Web3Modal from "web3modal";
-// import {ethers} from "ethers";
-// import {create as ipfsHttpClient} from "ipfs-http-client";
-// import axios from "axios";
-// import { useRouter } from "next/router";
-
-// //internal import
-
-// import { VotingAddress, VotingAddressABI } from './constants';
-
-// const client = ipfsHttpClient("https://ipfs.infura.io:5001/api/v0");
-
-// const fetchContract = (signerOrProvider) =>
-//  new ethers.Contract(VotingAddress,VotingAddressABI, signerOrProvider);
-
-
-//  export const VotingContext = React.createContext();
-
-
-//  export const VotingProvider = ({ children }) => {
-//     const votingTitle = "My first smart contract app";
-//     const router = useRouter();
-//     const [currentAccount, setCurrentAccount] = useState('');
-//     const [candidateLength, setCandidateLength] = useState('');
-//     const pushCandidate = [];
-//     const condidateIndex = [];
-//     const [candidateArray, setCandidateArray] = useState(pushCandidate);
-//    // end of candidate data
-
-//    const [error, setError] = useState('');
-
-//    //voter section
-
-//    const pushVoter = [];
-//    const [voterArray, setVoterArray] = useState(pushVoter);
-//    const [voterLength, setVoterLength] = useState('');
-//    const [voterAddress, setVoterAddress] = useState([]);
-
-//    //--connecting metamask
-
-//    const checkIfWalletIsConnected = async () => {
-//     if(!window.ethereum) return setError("Please Install Metamask");
-
-//     const account = await window.ethereum.request({method: "eth_accounts",});
-
-//     if(account.length){
-//       setCurrentAccount(account[0]);
-//     }
-//     else{
-//       setError("Please Install Metamask & Connect, Reload");
-//     }
-
-//    }; 
-
-//    // connecting wallet
-
-//    const connectWallet = async () => {
-//     if(!window.ethereum) return setError("Please Install Metamask");
-
-//     const account = await window.ethereum.request({method: "eth_requestAccounts",});
-
-//      setCurrentAccount(account[0]);
-//    };
-
-//    //upload to ipfs
-
-//    const uploadToIPFS = async (file) => {
-//     try{
-//       const added = await client.add({content: file});
-
-//       const url = `https://ipfs.infura.io/ipfs/${added.path}`;
-//       return url;
-//     }
-//     catch(error){
-//       setError("error uploading the file");
-//     }
-//    };
-
-
-//     return (
-//     <VotingContext.Provider value={{ votingTitle, checkIfWalletIsConnected, connectWallet,
-//      uploadToIPFS }}>
-//       {children}
-//       </VotingContext.Provider>
-//       );
-//  };
-
-
-
-
-
 import React, { useState, useEffect } from "react";
 import Web3Modal from "web3modal";
 import { ethers } from "ethers";
@@ -97,35 +5,40 @@ import { create as ipfsHttpClient } from "ipfs-http-client";
 import axios from "axios";
 import { useRouter } from "next/router";
 import { Buffer } from 'buffer';
-//const { ipfsClient }= require('ipfs-http-client');
 //INTERNAL IMPORT
-import { VotingAddress, VotingAddressABI } from "./constants";
+import Create from "../artifacts/contracts/Create.sol/Create.json";
+const CreatorAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 
 
 const projectId = "2IuYl6JV9M1CGJYU9UYxrrXtsrh";
 const projectSecret = "243164c76b145cae1884669b71940b37";
 const auth =
 'Basic ' + Buffer.from(projectId + ':' + projectSecret).toString('base64');
-// const auth = `Basic ${Buffer.from(`${projectId}:${projectSecret}`).toString(
-//   "base64"
-// )}`;
 
 const client = ipfsHttpClient({
   host: "ipfs.infura.io",
   port: 5001,
   protocol: "https",
-  //apiPath: "/api/v0",
   headers: {
     authorization: auth,
   },
 });
 
 
-
-//const client = ipfsHttpClient("https://ipfs.infura.io:5001/api/v0");
-
 const fetchContract = (signerOrProvider) =>
-  new ethers.Contract(VotingAddress, VotingAddressABI, signerOrProvider);
+  new ethers.Contract(CreatorAddress, Create.abi, signerOrProvider);
+
+  const initializeContract = async () => {
+    try {
+      if(typeof window.ethereum!=="undefined"){
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      contract = fetchContract(provider);
+      }
+    } catch (error) {
+      console.log("Error initializing contract:", error);
+    }
+  };
+
 
 export const VotingContext = React.createContext();
 
@@ -143,8 +56,10 @@ export const VotingProvider = ({ children }) => {
 
   const pushVoter = [];
   const [voterArray, setVoterArray] = useState(pushVoter);
+  const [savedAddress,setSavedAddress] = useState("");
   const [voterLength, setVoterLength] = useState("");
   const [voterAddress, setVoterAddress] = useState([]);
+  const [winner,setWinner] = useState("");
   ///CONNECTING METAMASK
   const checkIfWalletIsConnected = async () => {
     if (!window.ethereum) return setError("Please Install MetaMask");
@@ -161,7 +76,7 @@ export const VotingProvider = ({ children }) => {
   };
 
   // ===========================================================
-  //CONNECT WELATE
+  //CONNECT Wallet
   const connectWallet = async () => {
     if (!window.ethereum) return alert("Please install MetaMask");
 
@@ -174,7 +89,7 @@ export const VotingProvider = ({ children }) => {
     getNewCandidate();
   };
   // ================================================
-
+  
   //UPLOAD TO IPFS Voter
   const uploadToIPFS = async (file) => {
     //setUploading(true);
@@ -190,19 +105,6 @@ export const VotingProvider = ({ children }) => {
       console.log("Error uploading file to IPFS");
     }
   };
-  // const uploadToIPFS = async (e) => {
-  //   e.preventDefault();
-  //   setUploading(true);
-  //   if (text !== "") {
-  //     try {
-  //       const added = await client.add(text);
-
-  //       setDescriptionUrl(added.path);
-  //     } catch (error) {
-  //       toast.warn("error to uploading text");
-  //     }
-  //   };
-  // };
 
   //UPLOAD TO IPFS Candidate
   const uploadToIPFSCandidate = async (file) => {
@@ -224,33 +126,36 @@ export const VotingProvider = ({ children }) => {
     if (!name || !address || !position)
       return console.log("Input Data is missing");
 
-    const web3Modal = new Web3Modal();
-    const connection = await web3Modal.connect();
-    const provider = new ethers.providers.Web3Provider(connection);
-    const signer = provider.getSigner();
-    const contract = fetchContract(signer);
-
+    let candu;
+    try {
+      if(typeof window.ethereum!=="undefined"){
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    candu = fetchContract(provider.getSigner());
     const data = JSON.stringify({ name, address, position, image: fileUrl });
     const added = await client.add(data);
 
     const url = `https://akarsh.infura-ipfs.io/ipfs/${added.path}`;
 
-    const voter = await contract.voterRight(address, name, url, fileUrl);
+    const voter = await candu.voterRight(address, name, url, fileUrl);
     voter.wait();
+      }
+    } catch (error) {
+      console.log("Error initializing contract:", error);
+    }
+
+    
 
     router.push("/voterList");
   };
   // =============================================
 
   const getAllVoterData = async () => {
+    let contract;
     try {
-      const web3Modal = new Web3Modal();
-      const connection = await web3Modal.connect();
-      const provider = new ethers.providers.Web3Provider(connection);
-      const signer = provider.getSigner();
-      const contract = fetchContract(signer);
-      //VOTR LIST
-      const voterListData = await contract.getVoterList();
+    if(typeof window.ethereum!=="undefined"){
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    contract = fetchContract(provider);
+    const voterListData = await contract.getVoterList();
       setVoterAddress(voterListData);
 
       voterListData.map(async (el) => {
@@ -262,8 +167,9 @@ export const VotingProvider = ({ children }) => {
       const voterList = await contract.getVoterLength();
       setVoterLength(voterList.toNumber());
       console.log(voterLength);
+      }
     } catch (error) {
-      console.log("All data");
+      console.log("Error initializing contract:", error);
     }
   };
 
@@ -273,80 +179,97 @@ export const VotingProvider = ({ children }) => {
   ////////GIVE VOTE
 
   const giveVote = async (id) => {
+    let candu;
     try {
-      const voterAddress = id.address;
-      const voterId = id.id;
-      const web3Modal = new Web3Modal();
-      const connection = await web3Modal.connect();
-      const provider = new ethers.providers.Web3Provider(connection);
-      const signer = provider.getSigner();
-      const contract = fetchContract(signer);
-
-      const voteredList = await contract.vote(voterAddress, voterId);
-      console.log(voteredList);
+      if(typeof window.ethereum!=="undefined"){
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    candu = fetchContract(provider.getSigner());
+    const voteredList = await candu.vote(voterAddress, voterId);
+    console.log(voteredList);
+      }
     } catch (error) {
-      setError("Sorry!, You have already voted, Reload Browser");
+      console.log("Error initializing contract:", error);
     }
   };
   // =============================================
 
   const setCandidate = async (candidateForm, fileUrl, router) => {
+    
+
+
     const { name, address, age } = candidateForm;
 
     if (!name || !address || !age) return console.log("Input Data is missing");
 
-    const web3Modal = new Web3Modal();
-    const connection = await web3Modal.connect();
-    const provider = new ethers.providers.Web3Provider(connection);
-    const signer = provider.getSigner();
-    const contract = fetchContract(signer);
+    let candu;
+    try {
+      if(typeof window.ethereum!=="undefined"){
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      candu = fetchContract(provider.getSigner());
+      const data = JSON.stringify({
+        name,
+        address,
+        image: fileUrl,
+        age,
+      });
+      const added = await client.add(data);
+  
+      const ipfs = `https://akarsh.infura-ipfs.io/ipfs/${added.path}`;
+  
+      const candidate = await candu.setCandidate(
+        address,
+        age,
+        name,
+        fileUrl,
+        ipfs
+      );
+      candidate.wait();
+      }
+    } catch (error) {
+      console.log("Error initializing contract:", error);
+    }
 
-    const data = JSON.stringify({
-      name,
-      address,
-      image: fileUrl,
-      age,
-    });
-    const added = await client.add(data);
-
-    const ipfs = `https://akarsh.infura-ipfs.io/ipfs/${added.path}`;
-
-    const candidate = await contract.setCandidate(
-      address,
-      age,
-      name,
-      fileUrl,
-      ipfs
-    );
-    candidate.wait();
+    
 
     router.push("/");
   };
 
   const getNewCandidate = async () => {
-    const web3Modal = new Web3Modal();
-    const connection = await web3Modal.connect();
-    const provider = new ethers.providers.Web3Provider(connection);
-    const signer = provider.getSigner();
-    const contract = fetchContract(signer);
-
-    //---------ALL CANDIDATE
-    const allCandidate = await contract.getCandidate();
-
-    //--------CANDIDATE DATA
+    let candu;
+    try {
+      if(typeof window.ethereum!=="undefined"){
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    candu = fetchContract(provider);
+    const allCandidate = await candu.getCandidate();
     allCandidate.map(async (el) => {
-      const singleCandidateData = await contract.getCandidateData(el);
-
+      const singleCandidateData = await candu.getCandidateData(el);
       pushCandidate.push(singleCandidateData);
       candidateIndex.push(singleCandidateData[2].toNumber());
     });
-
-    //---------CANDIDATE LENGTH
-    const allCandidateLength = await contract.getCandidateLength();
+    const allCandidateLength = await candu.getCandidateLength();
     setCandidateLength(allCandidateLength.toNumber());
+      }
+    } catch (error) {
+      console.log("Error initializing contract:", error);
+    }
   };
 
-  console.log(error);
+  const getWinner = async () =>{
+    let candu;
+    try {
+      if(typeof window.ethereum!=="undefined"){
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    candu = fetchContract(provider);
+    const theWinner = await contract.getWinner();
+    const winnerData = await contract.getCandidateData(theWinner);
+    const winnerName = winnerData[1];
+    console.log(winnerName);
+    setWinner(winnerName);
+      }
+    } catch (error) {
+      console.log("Error initializing contract:", error);
+    }
+  };
 
   return (
     <VotingContext.Provider
@@ -357,6 +280,7 @@ export const VotingProvider = ({ children }) => {
         createVoter,
         setCandidate,
         getNewCandidate,
+        savedAddress,
         giveVote,
         pushCandidate,
         candidateArray,
@@ -368,6 +292,8 @@ export const VotingProvider = ({ children }) => {
         error,
         candidateLength,
         voterLength,
+        getWinner,
+        winner
       }}
     >
       {children}
