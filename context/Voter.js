@@ -6,7 +6,7 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import { Buffer } from 'buffer';
 //INTERNAL IMPORT
-import Create from "../artifacts/contracts/Create.sol/Create.json";
+import Create from "./Create.json";
 const CreatorAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 
 
