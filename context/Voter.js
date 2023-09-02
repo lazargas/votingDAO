@@ -178,14 +178,16 @@ export const VotingProvider = ({ children }) => {
   // =============================================
   ////////GIVE VOTE
 
-  const giveVote = async (id) => {
+  const giveVote = async (candidateAddress,candidateId) => {
     let candu;
     try {
       if(typeof window.ethereum!=="undefined"){
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     candu = fetchContract(provider.getSigner());
-    const voteredList = await candu.vote(voterAddress, voterId);
-    console.log(voteredList);
+    console.log(candidateAddress);
+    console.log(candidateId);
+    const voteredList = await candu.vote(candidateAddress, candidateId);
+    voteredList.wait();
       }
     } catch (error) {
       console.log("Error initializing contract:", error);
@@ -260,8 +262,8 @@ export const VotingProvider = ({ children }) => {
       if(typeof window.ethereum!=="undefined"){
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     candu = fetchContract(provider);
-    const theWinner = await contract.getWinner();
-    const winnerData = await contract.getCandidateData(theWinner);
+    const theWinner = await candu.getWinner();
+    const winnerData = await candu.getCandidateData(theWinner);
     const winnerName = winnerData[1];
     console.log(winnerName);
     setWinner(winnerName);

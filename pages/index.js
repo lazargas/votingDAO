@@ -73,7 +73,7 @@ const index = () => {
         </div>
       )}
 
-      {/* <Card candidateArray={candidateArray} giveVote={giveVote} /> */}
+      <Card candidateArray={candidateArray} giveVote={giveVote} />
       <div id="winnercontainer" className={Style.winner_container} >
          <button id="winnerbutton" onClick={getWinner} className={Style.winner_button} >
             {winner?`${winner}`:<div>Find Current Winner</div>}
